@@ -1,0 +1,72 @@
+<?php
+/**
+ * Created by PhpStorm.
+ * User: alexboyce
+ * Date: 4/1/14
+ * Time: 1:59 PM
+ */
+
+function privatefiles_schema() {
+  $schema = array();
+
+  $schema['privatefiles'] = array(
+    'fields' => array(
+      'id' => array(
+        'type' => 'serial',
+        'unsigned' => TRUE,
+        'not null' => TRUE
+      ),
+      'fid' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE
+      ),
+      'created' => array(
+        'type' => 'int',
+        'unsigned' => TRUE,
+        'not null' => TRUE
+      ),
+      'security_level' => array(
+        'type' => 'varchar',
+        'length' => 10,
+        'not null' => TRUE,
+        'default' => 'url'
+      ),
+      'users' => array(
+        'type' => 'text',
+        'size' => 'small',
+        'serialize' => TRUE,
+        'not null' => FALSE
+      ),
+      'roles' => array(
+        'type' => 'text',
+        'size' => 'small',
+        'serialize' => TRUE,
+        'not null' => FALSE
+      )
+    ),
+    'primary key' => array('id'),
+    'unique keys' => array(
+      'id_fid' => array('fid')
+    ),
+    'foreign keys' => array(
+      'fid' => array(
+        'table' => 'file',
+        'columns' => array(
+          'fid' => 'fid'
+        )
+      )
+    )
+  );
+
+  return $schema;
+}
+
+function privatefiles_install() {
+  $salt = mhash(MHASH_SHA1, mt_rand(1000000));
+  variable_set('privatefiles_salt', $salt);
+}
+
+function privatefiles_uninstall() {
+  variable_del('privatefiles_salt');
+}

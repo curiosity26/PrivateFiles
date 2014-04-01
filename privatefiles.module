@@ -1,0 +1,116 @@
+<?php
+/**
+ * Created by PhpStorm.
+ * User: alexboyce
+ * Date: 4/1/14
+ * Time: 1:59 PM
+ */
+
+function privatefiles_menu() {
+  $menu = array();
+
+  $menu['private/file/%privatefile'] = array(
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('privatefile_form', 2),
+    'access callback' => 'privatefile_access',
+    'access arguments' => array('view', 2),
+    'type' => MENU_CALLBACK
+  );
+
+  return $menu;
+}
+
+function privatefile_load($hash) {
+  $decoded = privatefiles_decode($hash);
+  return PrivateFileController::load($decoded['id']);
+}
+
+function privatefile_access($op = 'view', PrivateFile $file, $account = NULL) {
+  if (!$account) {
+    $account = $GLOBALS['user'];
+  }
+
+  if ($account->uid === 1 || user_access('administer private files', $account)) {
+    return TRUE;
+  }
+
+  if ($op == 'view') {
+    if (user_access('bypass private file security', $account)) {
+      return TRUE;
+    }
+
+    switch ($file->security_level) {
+      case PRIVATEFILE_USER_SECURED:
+        return in_array($account->uid, $file->users, TRUE);
+        break;
+      case PRIVATEFILE_ROLE_SECURED:
+        foreach (array_keys($account->roles) as $rid) {
+          if (in_array($rid, $file->roles, TRUE)) {
+            return TRUE;
+          }
+        }
+        return FALSE;
+        break;
+      case PRIVATEFILE_URL_SECURED:
+        return TRUE; // Really not much security involved here
+        break;
+    }
+  }
+  else {
+    return user_access($op.' private files', $account);
+  }
+
+  return FALSE;
+}
+
+function privatefiles_permission() {
+  $perms = array();
+
+  $perms['administer private files'] = array(
+    'title' => t('Administer Private Files'),
+    'description' => t('Roles with this permission are granted unrestricted access to any private files'),
+    'restrict access' => TRUE
+  );
+
+  $perms['bypass private file security'] = array(
+    'title' => t('Bypass Private File Security'),
+    'description' => t('Roles with this permission are granted access to any private file via its URL'),
+    'restrict access' => TRUE
+  );
+
+  $perms['create private files'] = array(
+    'title' => t('Create Private File URL\'s'),
+    'description' => t('Roles with this permission can create private URL\'s for files')
+  );
+
+  $perms['update private files'] = array(
+    'title' => t('Update Private File URL\'s'),
+    'description' => t('Roles with this permission can update existing private URL\'s for files')
+  );
+
+  $perms['delete private files'] = array(
+    'title' => t('Delete Private File URL\'s'),
+    'description' => t('Roles with this permission can remove private URL\'s for files (they will be prompted to delete the file itself)')
+  );
+
+  return $perms;
+}
+
+function privatefiles_encode(PrivateFile $file) {
+  $salt = variable_get('privatefiles_salt', '');
+  $data = $file->id.'|'.$file->fid.'|'.$file->created;
+  $secured = mcrypt_encrypt(MCRYPT_BLOWFISH, $salt, $data, MCRYPT_MODE_ECB);
+  return base64_encode($secured);
+}
+
+function privatefiles_decode($encoded) {
+  $salt = variable_get('privatefiles_salt', '');
+  $data = base64_decode($encoded);
+  $data = mcrypt_decrypt(MCRYPT_BLOWFISH, $salt, $data, MCRYPT_MODE_ECB);
+  list($id, $fid, $created) = explode('|', $data);
+  return array(
+    'id' => $id,
+    'fid' => $fid,
+    'created' => $created
+  );
+}

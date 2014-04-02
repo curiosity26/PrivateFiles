@@ -124,10 +124,18 @@ function privatefiles_entity_form($form, &$form_state, PrivateFile $entity = NUL
     '#upload_location' => 'private://'
   );
 
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Save'),
+    '#suffix' => l('Cancel', 'admin/structure/privatefiles')
+  );
+
   return $form;
 }
 
 function privatefiles_entity_form_submit($form, &$form_state) {
+  $form_state['redirect'] = 'admin/structure/privatefiles';
+
   $file = $form_state['privatefile'];
   $values = $form_state['values'];
   $values['fid'] = $values['file']['fid'];

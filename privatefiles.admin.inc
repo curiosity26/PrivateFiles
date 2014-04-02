@@ -77,7 +77,7 @@ function privatefiles_entity_form($form, &$form_state, PrivateFile $entity = NUL
   );
 
   $roles = user_roles();
-  unset($roles[0]);
+  unset($roles[1]);
   $form['roles'] = array(
     '#title' => t('Roles'),
     '#type' => 'select',

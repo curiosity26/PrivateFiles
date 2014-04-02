@@ -6,7 +6,7 @@
     attach: function(context, settings) {
       $(".pf-hash-clipboard").click(function(event) {
         event.preventDefault();
-        var text = $(this).parent().parent().child("a").first().text();
+        var text = $("a:not('.pf-hash-clipboard')", $(this).parent().parent()).first();
         var url = location.protocol + '//' + location.hostname + '/private/file/' + text;
         if (!!window.clipboardData) {
           window.clipboardData.setData("Text", url);

@@ -18,10 +18,11 @@ function privatefiles_menu() {
   );
 
   $menu['admin/structure/privatefiles'] = array(
+    'title' => 'Private Files',
+    'description' => t('Manage secured links for privately uploaded files'),
     'page callback' => 'privatefiles_list',
     'access arguments' => array('administer private files'),
     'type' => MENU_NORMAL_ITEM,
-    'menu_name' => 'admin',
     'file' => 'privatefiles.admin.inc'
   );
 

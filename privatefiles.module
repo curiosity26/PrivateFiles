@@ -10,7 +10,7 @@ function privatefiles_menu() {
   $menu = array();
 
   $menu['private/file/%privatefile_hash'] = array(
-    'page callback' => 'privatefile_download',
+    'page callback' => 'privatefile_download_link',
     'page arguments' => array(2),
     'access callback' => 'privatefile_access',
     'access arguments' => array('view', 2),
@@ -173,7 +173,7 @@ function privatefiles_decode($encoded) {
   return FALSE;
 }
 
-function privatefile_download(PrivateFile $pfile) {
+function privatefile_download_link(PrivateFile $pfile) {
   $file = file_load($pfile);
   dpm($file, 'File called to download');
   if (!!$file) {

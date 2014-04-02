@@ -43,6 +43,10 @@ function privatefiles_schema() {
         'size' => 'small',
         'serialize' => TRUE,
         'not null' => FALSE
+      ),
+      'expiration_date' => array(
+        'type' => 'datetime',
+        'not null' => FALSE
       )
     ),
     'primary key' => array('id'),

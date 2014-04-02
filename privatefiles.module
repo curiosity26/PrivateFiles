@@ -26,7 +26,8 @@ function privatefiles_menu() {
   );
 
   $menu['admin/structure/privatefiles/add'] = array(
-    'page callback' => 'privatefiles_add',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('privatefiles_entity_form'),
     'access callback' => 'privatefile_access',
     'access arguments' => array('create'),
     'type' => MENU_LOCAL_ACTION,
@@ -34,8 +35,8 @@ function privatefiles_menu() {
   );
 
   $menu['admin/structure/privatefiles/%privatefile/edit'] = array(
-    'page callback' => 'privatefiles_edit',
-    'page arguments' => array(3),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('privatefiles_entity_form', 3),
     'access callback' => 'privatefile_access',
     'access arguments' => array('update', 3),
     'type' => MENU_CALLBACK,
@@ -44,7 +45,7 @@ function privatefiles_menu() {
 
   $menu['admin/structure/privatefiles/%privatefile/delete'] = array(
     'page callback' => 'drupal_get_form',
-    'page arguments' => array('privatefiles_edit', 3),
+    'page arguments' => array('privatefiles_delete', 3),
     'access callback' => 'privatefile_access',
     'access arguments' => array('delete', 3),
     'type' => MENU_CALLBACK,
@@ -55,8 +56,7 @@ function privatefiles_menu() {
 }
 
 function privatefile_load($hash) {
-  $decoded = privatefiles_decode($hash);
-  return PrivateFileController::load($decoded['id']);
+  return privatefiles_decode($hash);
 }
 
 function privatefile_access($op = 'view', PrivateFile $file = NULL, $account = NULL) {
@@ -73,21 +73,28 @@ function privatefile_access($op = 'view', PrivateFile $file = NULL, $account = N
       return TRUE;
     }
 
-    switch ($file->security_level) {
-      case PRIVATEFILE_USER_SECURED:
-        return in_array($account->uid, $file->users, TRUE);
-        break;
-      case PRIVATEFILE_ROLE_SECURED:
-        foreach (array_keys($account->roles) as $rid) {
-          if (in_array($rid, $file->roles, TRUE)) {
-            return TRUE;
+    $today = new DateTime();
+    if (($file->expiration_date->getTimestamp() > $file->created && $file->expiration_date > $today)
+      || $file->expiration_date->getTimestamp() === $file->created) { // this file link hasn't expired or expiration isn't set
+      switch ($file->security_level) {
+        case PRIVATEFILE_USER_SECURED:
+          return in_array($account->uid, $file->users, TRUE);
+          break;
+        case PRIVATEFILE_ROLE_SECURED:
+          foreach (array_keys($account->roles) as $rid) {
+            if (in_array($rid, $file->roles, TRUE)) {
+              return TRUE;
+            }
           }
-        }
-        return FALSE;
-        break;
-      case PRIVATEFILE_URL_SECURED:
-        return TRUE; // Really not much security involved here, but at least they won't be downloading via this link
-        break;
+          return FALSE;
+          break;
+        case PRIVATEFILE_URL_SECURED:
+          return TRUE; // Really not much security involved here, but at least they won't be downloading via this link
+          break;
+      }
+    }
+    else {
+      return FALSE;
     }
   }
   else {
@@ -124,7 +131,8 @@ function privatefiles_permission() {
 
   $perms['delete private files'] = array(
     'title' => t('Delete Private File URL\'s'),
-    'description' => t('Roles with this permission can remove private URL\'s for files (they will be prompted to delete the file itself)')
+    'description' => t('Roles with this permission can remove private URL\'s for files
+    (the file associated will only be deleted if nothing else is using the file)')
   );
 
   return $perms;
@@ -142,11 +150,16 @@ function privatefiles_decode($encoded) {
   $data = base64_decode($encoded);
   $data = mcrypt_decrypt(MCRYPT_BLOWFISH, $salt, $data, MCRYPT_MODE_ECB);
   list($id, $fid, $created) = explode('|', $data);
-  return array(
-    'id' => $id,
-    'fid' => $fid,
-    'created' => $created
-  );
+  $pid = db_select('privatefiles', 'pf')
+    ->fields('pf', array('id'))
+    ->condition('fid', $fid)
+    ->condition('created', $created)
+    ->execute()
+    ->fetchField();
+  if ($pid === $id) {
+    return PrivateFileController::load($id);
+  }
+  return FALSE;
 }
 
 function privatefile_download(PrivateFile $pfile) {
@@ -174,12 +187,12 @@ function privatefiles_file_download($uri) {
       return NULL;
     }
 
-    $pfid = db_select('privatefiles', 'pf')
+    $pid = db_select('privatefiles', 'pf')
       ->fields('pf', array('id'))
       ->condition('fid', $file->fid)
       ->execute()->fetchField();
 
-    if (!!$pfid) {
+    if (!!$pid) {
       return file_get_content_headers($file);
     }
   }

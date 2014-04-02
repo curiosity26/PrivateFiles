@@ -10,11 +10,45 @@ function privatefiles_menu() {
   $menu = array();
 
   $menu['private/file/%privatefile'] = array(
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('privatefile_form', 2),
+    'page callback' => 'privatefile_download',
+    'page arguments' => array(2),
     'access callback' => 'privatefile_access',
     'access arguments' => array('view', 2),
     'type' => MENU_CALLBACK
+  );
+
+  $menu['admin/structure/privatefiles'] = array(
+    'page callback' => 'privatefiles_list',
+    'access arguments' => array('administer private files'),
+    'type' => MENU_NORMAL_ITEM,
+    'menu_name' => 'admin',
+    'file' => 'privatefiles.admin.inc'
+  );
+
+  $menu['admin/structure/privatefiles/add'] = array(
+    'page callback' => 'privatefiles_add',
+    'access callback' => 'privatefile_access',
+    'access arguments' => array('create'),
+    'type' => MENU_LOCAL_ACTION,
+    'file' => 'privatefiles.admin.inc'
+  );
+
+  $menu['admin/structure/privatefiles/%privatefile/edit'] = array(
+    'page callback' => 'privatefiles_edit',
+    'page arguments' => array(3),
+    'access callback' => 'privatefile_access',
+    'access arguments' => array('update', 3),
+    'type' => MENU_CALLBACK,
+    'file' => 'privatefiles.admin.inc'
+  );
+
+  $menu['admin/structure/privatefiles/%privatefile/delete'] = array(
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('privatefiles_edit', 3),
+    'access callback' => 'privatefile_access',
+    'access arguments' => array('delete', 3),
+    'type' => MENU_CALLBACK,
+    'file' => 'privatefiles.admin.inc'
   );
 
   return $menu;
@@ -25,7 +59,7 @@ function privatefile_load($hash) {
   return PrivateFileController::load($decoded['id']);
 }
 
-function privatefile_access($op = 'view', PrivateFile $file, $account = NULL) {
+function privatefile_access($op = 'view', PrivateFile $file = NULL, $account = NULL) {
   if (!$account) {
     $account = $GLOBALS['user'];
   }
@@ -52,7 +86,7 @@ function privatefile_access($op = 'view', PrivateFile $file, $account = NULL) {
         return FALSE;
         break;
       case PRIVATEFILE_URL_SECURED:
-        return TRUE; // Really not much security involved here
+        return TRUE; // Really not much security involved here, but at least they won't be downloading via this link
         break;
     }
   }
@@ -113,4 +147,42 @@ function privatefiles_decode($encoded) {
     'fid' => $fid,
     'created' => $created
   );
+}
+
+function privatefile_download(PrivateFile $pfile) {
+  $file = file_load($pfile);
+  if (!!$file) {
+    $schema = file_uri_scheme($file->uri);
+    $target = file_uri_target($file->uri);
+    file_download($schema, $target);
+  }
+  drupal_not_found();
+}
+
+function privatefiles_file_download($uri) {
+  $files = file_load_multiple(FALSE, array('uri' => $uri));
+
+  if (!!$files && count($files)) {
+    foreach ($files as $item) {
+      if ($item->uri === $uri) { // Double check, DB's can be case-insensitive
+        $file = $item;
+        break;
+      }
+    }
+
+    if (!isset($file)) {
+      return NULL;
+    }
+
+    $pfid = db_select('privatefiles', 'pf')
+      ->fields('pf', array('id'))
+      ->condition('fid', $file->fid)
+      ->execute()->fetchField();
+
+    if (!!$pfid) {
+      return file_get_content_headers($file);
+    }
+  }
+
+  return NULL;
 }

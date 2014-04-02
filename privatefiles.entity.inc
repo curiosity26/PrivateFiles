@@ -11,13 +11,20 @@ define('PRIVATEFILE_ROLE_SECURED', 'role');
 define('PRIVATEFILE_URL_SECURED', 'url');
 
 class PrivateFile {
-  public $id, $fid, $created, $security_level = PRIVATEFILE_URL_SECURED, $users, $roles;
+  public $id,
+    $fid,
+    $created,
+    $security_level = PRIVATEFILE_URL_SECURED,
+    $users = array(),
+    $roles = array(),
+    $hash;
 
   public function __construct(array $values = array()) {
     if (!empty($values)) {
       foreach ($values as $key => $value) {
         $this->$key = $value;
       }
+      $this->hash();
     }
   }
 
@@ -28,6 +35,14 @@ class PrivateFile {
   public function delete() {
     return PrivateFileController::delete($this);
   }
+
+  public function hash() {
+    if (!!$this->id && !!$this->fid && !!$this->created) {
+      $this->hash = privatefiles_encode($this);
+      return $this->hash;
+    }
+    return FALSE;
+  }
 }
 
 class PrivateFileController {
@@ -35,17 +50,46 @@ class PrivateFileController {
     return new PrivateFile($values);
   }
 
-  static public function load($id) {
+  static public function load($ids, $reset = FALSE) {
     $files = &drupal_static(__FUNCTION__);
-    if (empty($files) || empty($files[$id])) {
-      $values = db_select('privatefiles', 'pf')
+    $ret = array();
+    $ids = (array)$ids;
+
+    if ($reset) {
+      $pfiles = db_select('privatefiles', 'pf')
         ->fields('pf', array('id', 'fid', 'created'))
-        ->condition('id', $id)
+        ->condition('id', $ids, 'IN')
         ->execute()
-        ->fetchAssoc();
-      $files[$id] = new PrivateFile((array)$values);
+        ->fetchAllAssoc('id');
+      if (count($pfiles)) {
+        foreach ($pfiles as $id => $file) {
+          $files[$id] = new PrivateFile($file);
+        }
+      }
+      else {
+        $files = array();
+      }
+      return $files;
     }
-    return $files[$id];
+    else {
+      foreach ($ids as $id) {
+        if ($reset || empty($files) || empty($files[$id])) {
+          $values = db_select('privatefiles', 'pf')
+            ->fields('pf', array('id', 'fid', 'created'))
+            ->condition('id', $id)
+            ->execute()
+            ->fetchAssoc();
+          if (count($values)) {
+            $files[$id] = new PrivateFile((array)$values);
+          }
+        }
+        if (isset($files[$id])) {
+          $ret[$id] = $files[$id];
+        }
+      }
+    }
+
+    return $ret;
   }
 
   static public function save(PrivateFile $file) {

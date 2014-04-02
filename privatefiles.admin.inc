@@ -34,6 +34,8 @@ function privatefiles_list() {
     '#theme' => 'table',
     '#rows' => $rows,
     '#header' => array(t('ID'), t('Filename'), t('Link'), array('data' => t('Operations'), 'colspan' => 3)),
+    '#empty' => t('No private file links created. !link.',
+      array('!link' => l('Add a new link', 'admin/structure/privatefiles/add'))),
     '#attached' => array(
       'js' => array(drupal_get_path('module', 'privatefiles').'/js/privatefiles.js')
     )

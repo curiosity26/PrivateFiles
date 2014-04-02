@@ -12,7 +12,6 @@ function privatefiles_list() {
 
   $query->extend('PagerDefault')->limit(25)->orderBy('created', 'DESC');
   $ids = $query->execute()->fetchAllAssoc('id');
-  PrivateFileController::resetCache();
   $files = PrivateFileController::load(array_keys($ids));
   $files = !is_array($files) ? array($files->id => $files) : $files;
 
@@ -68,6 +67,14 @@ function privatefiles_entity_form($form, &$form_state, PrivateFile $entity = NUL
     '#required' => TRUE
   );
 
+  $default_users = array();
+  if (!!$entity) {
+    $accounts = user_load_multiple($entity->users);
+    foreach ($accounts as $user) {
+      $default_users[] = $user->name;
+    }
+  }
+
   $form['users'] = array(
     '#title' => t('User Accounts'),
     '#type' => 'textfield',
@@ -77,7 +84,7 @@ function privatefiles_entity_form($form, &$form_state, PrivateFile $entity = NUL
         ':input[name="security_level"]' => array('value' => PRIVATEFILE_USER_SECURED)
       )
     ),
-    '#default_value' => !!$entity ? implode(', ', $entity->users) : NULL
+    '#default_value' => implode(', ', $default_users)
   );
 
   $roles = user_roles();

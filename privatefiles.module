@@ -181,7 +181,7 @@ function privatefile_download_link(PrivateFile $pfile) {
     $target = file_uri_target($file->uri);
     //file_download($schema, $target);
   }
-  return array('#markup' => $file->filename);
+  return $file->filename;
   //drupal_not_found();
 }
 

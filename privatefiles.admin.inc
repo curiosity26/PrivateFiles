@@ -49,6 +49,7 @@ function privatefiles_list() {
 }
 
 function privatefiles_entity_form($form, &$form_state, PrivateFile $entity = NULL) {
+  module_load_include('inc', 'privatefiles', 'privatefiles.entity');
   $form_state['privatefile'] = $entity;
 
   $form['security_level'] = array(

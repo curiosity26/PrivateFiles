@@ -42,7 +42,7 @@ function privatefiles_list() {
   return $output;
 }
 
-function privatefiles_entity_form($form, &$form_state, PrivateFile $entity = FALSE) {
+function privatefiles_entity_form($form, &$form_state, PrivateFile $entity = NULL) {
   $form_state['privatefile'] = $entity;
 
   $form['security_level'] = array(

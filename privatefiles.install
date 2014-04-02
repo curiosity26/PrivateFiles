@@ -72,8 +72,8 @@ function privatefiles_install() {
   variable_set('privatefiles_salt', $salt);
   if (drupal_realpath('private://') === FALSE) {
     drupal_set_message(
-      t('The private file path is not configured. This will prevent file uploads via the Private Files module. %link',
-      array('%link' => l('Configure Private File Path', 'admin/config/media/file-system'))), 'error', TRUE);
+      t('The private file path is not configured. This will prevent file uploads via the Private Files module. !link',
+      array('!link' => l('Configure Private File Path', 'admin/config/media/file-system'))), 'error', TRUE);
   }
 }
 

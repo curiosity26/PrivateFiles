@@ -167,7 +167,9 @@ function privatefiles_entity_form_submit($form, &$form_state) {
   else {
     $file = PrivateFileController::create($values);
   }
-  $file->save();
+  if ($file->save() === FALSE) {
+    form_set_error(NULL, 'Failed to save private file');
+  }
 }
 
 function privatefiles_delete($form, &$form_state, PrivateFile $entity) {

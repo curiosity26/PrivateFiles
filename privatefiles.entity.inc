@@ -154,16 +154,20 @@ class PrivateFileController {
     $file->expiration_date = $exp_date->format(DateTime::ISO8601); // Prepare for DB Save
 
     if ($file->id != 0) {
-      drupal_write_record('private_file', $file, array('id'));
+      $success = drupal_write_record('privatefiles', $file, array('id'));
     }
     else {
-      drupal_write_record('private_file', $file);
+      $success = drupal_write_record('privatefiles', $file);
     }
 
     $file->expiration_date = $exp_date;
-    self::cacheSet(array($file->id => $file));
-    file_usage_add($mfile, 'privatefiles', 'privatefile', $file->id);
-    return $file;
+    if ($success !== FALSE) {
+      self::cacheSet(array($file->id => $file));
+      file_usage_add($mfile, 'privatefiles', 'privatefile', $file->id);
+      return $file;
+    }
+
+    return FALSE;
   }
 
   static public function delete(PrivateFile $file) {

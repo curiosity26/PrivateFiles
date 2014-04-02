@@ -98,10 +98,10 @@ function privatefiles_entity_form($form, &$form_state, PrivateFile $entity = NUL
   $form['expires'] = array(
     '#title' => t('Set an expiration date'),
     '#type' => 'checkbox',
-    '#default_value' => (!!$entity && $entity->expiration_date->getTimestamp() > $this->created)
+    '#default_value' => (!!$entity && $entity->expiration_date->getTimestamp() > $entity->created)
   );
 
-  $default_date = !!$entity && $entity->expiration_date->getTimestamp() > $this->created
+  $default_date = !!$entity && $entity->expiration_date->getTimestamp() > $entity->created
     ? $entity->expiration_date : new DateTime();
 
   $default_expiration = array(

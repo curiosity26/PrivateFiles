@@ -27,6 +27,7 @@ function privatefiles_menu() {
   );
 
   $menu['admin/structure/privatefiles/add'] = array(
+    'title' => 'Add a private link',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('privatefiles_entity_form'),
     'access callback' => 'privatefile_access',
@@ -36,6 +37,7 @@ function privatefiles_menu() {
   );
 
   $menu['admin/structure/privatefiles/%privatefile/edit'] = array(
+    'title' => 'Edit a link',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('privatefiles_entity_form', 3),
     'access callback' => 'privatefile_access',
@@ -45,6 +47,7 @@ function privatefiles_menu() {
   );
 
   $menu['admin/structure/privatefiles/%privatefile/delete'] = array(
+    'title' => 'Delete a link',
     'page callback' => 'drupal_get_form',
     'page arguments' => array('privatefiles_delete', 3),
     'access callback' => 'privatefile_access',

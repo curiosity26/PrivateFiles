@@ -95,7 +95,8 @@ class PrivateFileController {
       return $ret;
     }
     else {
-      $ret = self::cacheGet($ids);
+      //$ret = self::cacheGet($ids);
+      $ret = array();
       $no_cache_ids = array_diff_key(array_flip($ids), $ret);
       foreach (array_values($no_cache_ids) as $id) {
         $values = db_select('privatefiles', 'pf')
@@ -103,7 +104,7 @@ class PrivateFileController {
           ->condition('id', $id)
           ->execute()
           ->fetchAssoc();
-        dpm($values);
+        dpm($values, 'Values');
         if (count($values)) {
           $ret[$id] = self::create((array)$values);
         }

@@ -15,8 +15,7 @@ function privatefiles_list() {
   PrivateFileController::resetCache();
   $files = PrivateFileController::load(array_keys($ids));
   $rows = array();
-  dpm($files);
-  foreach ($files as $id => $file) {
+  foreach ((array)$files as $id => $file) {
     $mf = file_load($file->fid);
     if (!!$mf) {
       $rows[] = array(

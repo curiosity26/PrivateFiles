@@ -60,6 +60,7 @@ function privatefiles_menu() {
 }
 
 function privatefile_hash_load($hash) {
+  $hash = urldecode($hash);
   return privatefiles_decode($hash);
 }
 

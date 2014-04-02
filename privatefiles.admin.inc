@@ -10,7 +10,7 @@ function privatefiles_list() {
   $query = db_select('privatefiles', 'pf')
     ->fields('pf', array('id'));
 
-  $query->extend('PagerActivity')->limit(25)->orderBy('created', 'DESC');
+  $query->extend('PagerDefault')->limit(25)->orderBy('created', 'DESC');
   $ids = $query->execute()->fetchAllAssoc('id');
   $files = PrivateFileController::load(array_values($ids));
   $rows = array();
@@ -33,7 +33,7 @@ function privatefiles_list() {
     '#theme' => 'table',
     '#rows' => $rows,
     '#header' => array(t('ID'), t('Filename'), t('Link'), array('data' => t('Operations'), 'colspan' => 3)),
-    '#suffix' => theme_pager(array('element' => 0)),
+    '#suffix' => theme_pager(array('element' => 0, 'quantity' => 25)),
     '#attached' => array(
       'js' => array(drupal_get_path('module', 'privatefiles').'/js/privatefiles.js')
     )

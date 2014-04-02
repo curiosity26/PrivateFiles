@@ -83,6 +83,11 @@ function privatefile_access($op = 'view', PrivateFile $file = NULL, $account = N
     }
 
     $today = new DateTime();
+    dpm($today, 'Today');
+    dpm($file->expiration_date, 'Expiration Date');
+    dpm($file->expiration_date->getTimestamp(), 'Expiration Timestamp');
+    dpm($file->created, 'Created Timestamp');
+
     if (($file->expiration_date->getTimestamp() > $file->created && $file->expiration_date > $today)
       || $file->expiration_date->getTimestamp() === $file->created) { // this file link hasn't expired or expiration isn't set
       switch ($file->security_level) {

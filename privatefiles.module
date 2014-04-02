@@ -83,8 +83,6 @@ function privatefile_access($op = 'view', PrivateFile $file = NULL, $account = N
     }
 
     $today = new DateTime();
-    dpm($file, 'File');
-    dpm((int)($file->expiration_date > $today), 'Expired?');
     if (($file->expiration_date->getTimestamp() > $file->created && $file->expiration_date > $today)
       || $file->expiration_date->getTimestamp() === $file->created) { // this file link hasn't expired or expiration isn't set
       switch ($file->security_level) {
@@ -186,7 +184,6 @@ function privatefile_download_link(PrivateFile $pfile) {
 
 function privatefiles_file_download($uri) {
   $files = file_load_multiple(FALSE, array('uri' => $uri));
-  dpm($files, 'Files to Download');
   if (!!$files && count($files)) {
     foreach ($files as $item) {
       if ($item->uri === $uri) { // Double check, DB's can be case-insensitive

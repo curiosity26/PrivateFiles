@@ -20,14 +20,12 @@ function privatefiles_list() {
   foreach ($files as $id => $file) {
     $mf = file_load($file->fid);
     if (!!$mf) {
-      if (!$file->hash) {
-        $file->hash();
-      }
-
+      $hash = !!$file->hash ? $file->hash : $file->hash();
+      dpm($hash);
       $rows[] = array(
         $id,
         $mf->filename,
-        l($file->hash, 'private/files/'.$file->hash),
+        l($hash, 'private/files/'.$hash),
         l('copy to clipboard', 'javascript:void()', array('external' => TRUE, 'attributes' => array('class' => 'pf-hash-clipboard'))),
         l('edit', 'admin/structure/privatefiles/'.$id.'/edit'),
         l('delete', 'admin/structure/privatefiles/'.$id.'/delete')

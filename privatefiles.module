@@ -9,7 +9,7 @@
 function privatefiles_menu() {
   $menu = array();
 
-  $menu['private/file/%privatefile'] = array(
+  $menu['private/file/%privatefile_hash'] = array(
     'page callback' => 'privatefile_download',
     'page arguments' => array(2),
     'access callback' => 'privatefile_access',
@@ -59,8 +59,12 @@ function privatefiles_menu() {
   return $menu;
 }
 
-function privatefile_load($hash) {
+function privatefile_hash_load($hash) {
   return privatefiles_decode($hash);
+}
+
+function privatefile_load($id) {
+  return PrivateFileController::load($id);
 }
 
 function privatefile_access($op = 'view', PrivateFile $file = NULL, $account = NULL) {

@@ -29,14 +29,18 @@ function privatefiles_list() {
     }
   }
 
-  $output = array(
+  $output = array();
+  $output['pager_table'] = array(
     '#theme' => 'table',
     '#rows' => $rows,
     '#header' => array(t('ID'), t('Filename'), t('Link'), array('data' => t('Operations'), 'colspan' => 3)),
-    '#suffix' => theme_pager(array('element' => 0, 'quantity' => 25)),
     '#attached' => array(
       'js' => array(drupal_get_path('module', 'privatefiles').'/js/privatefiles.js')
     )
+  );
+
+  $output['pager'] = array(
+    '#theme' => 'pager'
   );
 
   return $output;

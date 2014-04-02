@@ -170,6 +170,9 @@ class PrivateFileController {
     if ($success !== FALSE) {
       self::cacheSet(array($file->id => $file));
       file_usage_add($mfile, 'privatefiles', 'privatefile', $file->id);
+      if (!!$file->hash) {
+        $file->hash();
+      }
       return $file;
     }
 

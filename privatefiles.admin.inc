@@ -15,14 +15,11 @@ function privatefiles_list() {
   PrivateFileController::resetCache();
   $files = PrivateFileController::load(array_keys($ids));
   $files = !is_array($files) ? array($files->id => $files) : $files;
-  dpm($files);
+
   $rows = array();
   foreach ($files as $id => $file) {
     $mf = file_load($file->fid);
     if (!!$mf) {
-      if (!$file->hash) {
-        $file->hash();
-      }
       $rows[] = array(
         $id,
         $mf->filename,

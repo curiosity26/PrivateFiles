@@ -12,6 +12,7 @@ function privatefiles_list() {
 
   $query->extend('PagerDefault')->limit(25)->orderBy('created', 'DESC');
   $ids = $query->execute()->fetchAllAssoc('id');
+  PrivateFileController::resetCache();
   $files = PrivateFileController::load(array_keys($ids));
   dpm($files);
   $rows = array();

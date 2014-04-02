@@ -96,6 +96,7 @@ class PrivateFileController {
     }
     else {
       $ret = self::cacheGet($ids);
+      dpm($ids);
       $no_cache_ids = array_diff_key($ret, array_flip($ids));
       foreach ($no_cache_ids as $id) {
         $values = db_select('privatefiles', 'pf')
@@ -146,8 +147,8 @@ class PrivateFileController {
       throw new DrupalUpdateException(t('PrivateFile file id must a valid file.'));
     }
 
-    if (empty($file->created)) {
-      $file->created = microtime();
+    if (!$file->created) {
+      $file->created = REQUEST_TIME;
     }
 
     $exp_date = $file->expiration_date;

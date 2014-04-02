@@ -175,14 +175,13 @@ function privatefiles_decode($encoded) {
 
 function privatefile_download_link(PrivateFile $pfile) {
   $file = file_load($pfile->fid);
-  dpm($file, 'File called to download');
   if (!!$file) {
     $schema = file_uri_scheme($file->uri);
     $target = file_uri_target($file->uri);
-    //file_download($schema, $target);
+    file_download($schema, $target);
   }
   return $file->filename;
-  //drupal_not_found();
+  drupal_not_found();
 }
 
 function privatefiles_file_download($uri) {

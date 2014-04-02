@@ -138,8 +138,7 @@ function privatefiles_entity_form_submit($form, &$form_state) {
 
   $file = $form_state['privatefile'];
   $values = $form_state['values'];
-  dpm($values);
-  $values['fid'] = $values['file']['fid'];
+  $values['fid'] = $values['file'];
   unset($values['file']);
 
   $accounts = explode(',', $values['users']);

@@ -103,6 +103,7 @@ class PrivateFileController {
           ->condition('id', $id)
           ->execute()
           ->fetchAssoc();
+        dpm($values);
         if (count($values)) {
           $ret[$id] = self::create((array)$values);
         }

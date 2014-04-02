@@ -14,7 +14,6 @@ function privatefiles_list() {
   $ids = $query->execute()->fetchAllAssoc('id');
   PrivateFileController::resetCache();
   $files = PrivateFileController::load(array_keys($ids));
-  dpm($files);
   $rows = array();
 
   foreach ($files as $id => $file) {

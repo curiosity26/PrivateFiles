@@ -23,7 +23,7 @@ function privatefiles_list() {
       $rows[] = array(
         $id,
         $mf->filename,
-        l($hash, 'private/files/'.$hash),
+        l($hash, 'private/file/'.$hash, array('attributes' => array('target' => '_blanks'))),
         l('copy to clipboard', 'javascript:void()', array('external' => TRUE, 'attributes' => array('class' => 'pf-hash-clipboard'))),
         l('edit', 'admin/structure/privatefiles/'.$id.'/edit'),
         l('delete', 'admin/structure/privatefiles/'.$id.'/delete')

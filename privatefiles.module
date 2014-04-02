@@ -174,7 +174,7 @@ function privatefiles_decode($encoded) {
 }
 
 function privatefile_download_link(PrivateFile $pfile) {
-  $file = file_load($pfile);
+  $file = file_load($pfile->fid);
   dpm($file, 'File called to download');
   if (!!$file) {
     $schema = file_uri_scheme($file->uri);

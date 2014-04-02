@@ -85,7 +85,10 @@ class PrivateFileController {
         ->fetchAllAssoc('id');
       if (count($pfiles)) {
         foreach ($pfiles as $id => $file) {
-          $ret[$id] = self::create((array)$file);
+          $file = (array)$file;
+          $file['users'] = unserialize($file['users']);
+          $file['roles'] = unserialize($file['roles']);
+          $ret[$id] = self::create($file);
         }
         self::cacheSet($ret);
       }
@@ -95,8 +98,7 @@ class PrivateFileController {
       return $ret;
     }
     else {
-      //$ret = self::cacheGet($ids);
-      $ret = array();
+      $ret = self::cacheGet($ids);
       $no_cache_ids = array_diff_key(array_flip($ids), $ret);
       foreach (array_keys($no_cache_ids) as $id) {
         $values = db_select('privatefiles', 'pf')
@@ -104,9 +106,11 @@ class PrivateFileController {
           ->condition('id', $id)
           ->execute()
           ->fetchAssoc();
-        dpm($values, 'Values for '.$id);
         if (count($values)) {
-          $ret[$id] = self::create((array)$values);
+          $values = (array)$values;
+          $values['users'] = unserialize($values['users']);
+          $values['roles'] = unserialize($values['roles']);
+          $ret[$id] = self::create($values);
         }
       }
     }

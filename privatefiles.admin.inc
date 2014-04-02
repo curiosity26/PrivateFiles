@@ -76,12 +76,13 @@ function privatefiles_entity_form($form, &$form_state, PrivateFile $entity = NUL
     '#default_value' => !!$entity ? implode(', ', $entity->users) : NULL
   );
 
-
+  $roles = user_roles();
+  unset($roles[0]);
   $form['roles'] = array(
     '#title' => t('Roles'),
     '#type' => 'select',
     '#multiple' => TRUE,
-    '#options' => user_roles(),
+    '#options' => $roles,
     '#states' => array(
       'visible' => array(
         ':input[name="security_level"]' => array('value' => PRIVATEFILE_ROLE_SECURED)
@@ -131,6 +132,10 @@ function privatefiles_entity_form_submit($form, &$form_state) {
   $values = $form_state['values'];
   $values['fid'] = $values['file']['fid'];
   unset($values['file']);
+
+  $accounts = explode(',', $values['users']);
+  $accounts = user_load_multiple(FALSE, array('name' => $accounts));
+  $values['users'] = array_keys($accounts);
 
   if ($values['expires']) {
     $exp_date = new DateTime();

@@ -18,6 +18,9 @@ function privatefiles_list() {
   foreach ((array)$files as $id => $file) {
     $mf = file_load($file->fid);
     if (!!$mf) {
+      if (!$file->hash) {
+        $file->hash();
+      }
       $rows[] = array(
         $id,
         $mf->filename,

@@ -86,17 +86,19 @@ function privatefile_access($op = 'view', PrivateFile $file = NULL, $account = N
     dpm($today, 'Today');
     dpm($file->expiration_date, 'Expiration Date');
     dpm($file->expiration_date->getTimestamp(), 'Expiration Timestamp');
-    dpm($file->created, 'Created Timestamp');
+    dpm((int)($file->expiration_date) > $today, 'Expiration not come yet');
+    dpm((int)(($file->expiration_date->getTimestamp() > $file->created && $file->expiration_date > $today)
+      || $file->expiration_date->getTimestamp() === $file->created), 'View granted');
 
     if (($file->expiration_date->getTimestamp() > $file->created && $file->expiration_date > $today)
       || $file->expiration_date->getTimestamp() === $file->created) { // this file link hasn't expired or expiration isn't set
       switch ($file->security_level) {
         case PRIVATEFILE_USER_SECURED:
-          return in_array($account->uid, $file->users, TRUE);
+          return in_array($account->uid, $file->users);
           break;
         case PRIVATEFILE_ROLE_SECURED:
           foreach (array_keys($account->roles) as $rid) {
-            if (in_array($rid, $file->roles, TRUE)) {
+            if (in_array($rid, $file->roles)) {
               return TRUE;
             }
           }

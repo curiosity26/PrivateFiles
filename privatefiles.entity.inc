@@ -97,6 +97,7 @@ class PrivateFileController {
     else {
       $ret = self::cacheGet($ids);
       $no_cache_ids = array_diff_key($ret, array_flip($ids));
+      dpm($no_cache_ids, 'No Cached IDs');
       foreach ($no_cache_ids as $id) {
         $values = db_select('privatefiles', 'pf')
           ->fields('pf')
@@ -107,6 +108,7 @@ class PrivateFileController {
           $ret[$id] = self::create((array)$values);
         }
       }
+      dpm($ret, 'Ret');
     }
 
     return count($ret) === 1 ? array_shift($ret) : $ret;

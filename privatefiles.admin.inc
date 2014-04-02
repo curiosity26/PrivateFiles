@@ -14,8 +14,10 @@ function privatefiles_list() {
   $ids = $query->execute()->fetchAllAssoc('id');
   PrivateFileController::resetCache();
   $files = PrivateFileController::load(array_keys($ids));
+  $files = !is_array($files) ? array($files->id => $files) : $files;
+  dpm($files);
   $rows = array();
-  foreach ((array)$files as $id => $file) {
+  foreach ($files as $id => $file) {
     $mf = file_load($file->fid);
     if (!!$mf) {
       if (!$file->hash) {

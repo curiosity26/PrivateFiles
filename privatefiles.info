@@ -3,5 +3,4 @@ name = Private Files
 description = Create secured, private URLs for file downloads
 core = 7.x
 package = 'SageAge Custom'
-dependencies[] = file
 files[] = privatefiles.entity.inc

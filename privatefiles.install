@@ -45,7 +45,8 @@ function privatefiles_schema() {
         'not null' => FALSE
       ),
       'expiration_date' => array(
-        'type' => 'datetime',
+        'type' => 'text',
+        'mysql_type' => 'DATETIME',
         'not null' => FALSE
       )
     ),

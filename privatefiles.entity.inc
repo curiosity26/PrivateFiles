@@ -85,7 +85,7 @@ class PrivateFileController {
         ->fetchAllAssoc('id');
       if (count($pfiles)) {
         foreach ($pfiles as $id => $file) {
-          $ret[$id] = self::create($file);
+          $ret[$id] = self::create((array)$file);
         }
         self::cacheSet($ret);
       }

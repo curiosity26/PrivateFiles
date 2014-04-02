@@ -96,6 +96,7 @@ class PrivateFileController {
     }
     else {
       $ret = self::cacheGet($ids);
+      dpm($ret, 'Ret from Cache');
       $no_cache_ids = array_diff_key($ret, array_flip($ids));
       dpm($no_cache_ids, 'No Cached IDs');
       foreach ($no_cache_ids as $id) {

@@ -57,7 +57,6 @@ class PrivateFile {
   }
 
   public function hash() {
-    dpm((int)(!!$this->id && !!$this->fid && !!$this->created), 'Meets hashing standards');
     if (!!$this->id && !!$this->fid && !!$this->created) {
       $this->hash = privatefiles_encode($this);
       return $this->hash;

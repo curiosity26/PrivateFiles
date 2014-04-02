@@ -20,7 +20,6 @@ function privatefiles_list() {
     $mf = file_load($file->fid);
     if (!!$mf) {
       $hash = !!$file->hash ? $file->hash : $file->hash();
-      dpm($hash);
       $rows[] = array(
         $id,
         $mf->filename,

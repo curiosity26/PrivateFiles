@@ -98,7 +98,7 @@ class PrivateFileController {
       $ret = self::cacheGet($ids);
       dpm($ret, 'Ret from Cache');
       dpm($ids, 'Ids');
-      $no_cache_ids = array_diff_key($ret, array_flip($ids));
+      $no_cache_ids = array_diff_key(array_flip($ids), $ret);
       dpm($no_cache_ids, 'No Cached IDs');
       foreach ($no_cache_ids as $id) {
         $values = db_select('privatefiles', 'pf')

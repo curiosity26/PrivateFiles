@@ -131,7 +131,8 @@ function privatefiles_entity_form($form, &$form_state, PrivateFile $entity = NUL
     '#title' => t('File'),
     '#type' => 'managed_file',
     '#default_value' => !!$entity ? $entity->fid : NULL,
-    '#upload_location' => 'private://'
+    '#upload_location' => 'private://',
+    '#progress_indicator' => 'bar'
   );
 
   $form['submit'] = array(
